@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 
 class DiceRollerPage extends StatefulWidget {
@@ -18,23 +17,15 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
     );
   }
 
-  void _rollCoin() {
-    final side = _rnd.nextBool() ? 'Heads' : 'Tails';
-    _showResult('Coin', side);
-  }
-
-  void _rollStandard(int faces) {
-    final roll = _rnd.nextInt(faces) + 1;
-    _showResult('d$faces', roll.toString());
-  }
-
+  void _rollCoin() => _showResult('Coin', _rnd.nextBool() ? 'Heads' : 'Tails');
+  void _rollStandard(int faces) =>
+      _showResult('d$faces', (_rnd.nextInt(faces) + 1).toString());
   void _rollCustom() {
     final n = int.tryParse(_customController.text) ?? 0;
     if (n < 1) {
       _showResult('Custom', 'Invalid # of faces');
     } else {
-      final roll = _rnd.nextInt(n) + 1;
-      _showResult('d$n', roll.toString());
+      _showResult('d$n', (_rnd.nextInt(n) + 1).toString());
     }
   }
 
@@ -44,38 +35,98 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
     VoidCallback? onRoll,
   }) {
     return SizedBox(
-      width: 100,
+      width: 140,
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          // grey pill label
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             decoration: BoxDecoration(
               color: Colors.grey.shade600,
               border: Border.all(color: Colors.white),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Text(label, style: const TextStyle(color: Colors.white)),
+            child: Text(label,
+                style: const TextStyle(color: Colors.white, fontSize: 16)),
           ),
-          const SizedBox(height: 12),
-
-          // icon
+          const SizedBox(height: 16),
           icon,
-          const SizedBox(height: 12),
-
-          // roll button
+          const SizedBox(height: 16),
           if (onRoll != null)
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.redAccent,
                 shape: const StadiumBorder(),
-                padding:
-                const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 32),
+                textStyle: const TextStyle(fontSize: 18),
               ),
               onPressed: onRoll,
-              child: const Text('Roll', style: TextStyle(color: Colors.white)),
+              child: const Text('Roll'),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _customColumn() {
+    return SizedBox(
+      width: 140,
+      child: Column(
+        children: [
+          // label pill
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade600,
+              border: Border.all(color: Colors.white),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Text('Custom roll',
+                style: TextStyle(color: Colors.white, fontSize: 16)),
+          ),
+          const SizedBox(height: 16),
+
+          // icon
+          Image.asset('assets/d20.jpg', width: 100, height: 100),
+          const SizedBox(height: 16),
+
+          // widened custom input box
+          Container(
+            width: 180, // ← made it wider
+            height: 40,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade600,
+              border: Border.all(color: Colors.white),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Center(
+              child: TextField(
+                controller: _customController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  isDense: true,
+                  border: InputBorder.none,
+                  hintText: 'Number of faces',
+                  hintStyle: TextStyle(color: Colors.white70, fontSize: 16),
+                ),
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // roll button
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              shape: const StadiumBorder(),
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 32),
+              textStyle: const TextStyle(fontSize: 18),
+            ),
+            onPressed: _rollCustom,
+            child: const Text('Roll'),
+          ),
         ],
       ),
     );
@@ -92,163 +143,83 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF4A90E2),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 12),
-          child: Column(
-            children: [
-              const Text(
-                'Dice roller',
-                style: TextStyle(
-                  fontSize: 32,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
+        child: Column(
+          children: [
+            const SizedBox(height: 32),
+            const Text(
+              'Dice roller',
+              style: TextStyle(
+                fontSize: 40,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 40),
+
+            // first row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _dieColumn(
+                  label: 'Coin',
+                  icon: Icon(Icons.monetization_on,
+                      size: 100, color: Colors.white),
+                  onRoll: _rollCoin,
                 ),
-              ),
-              const SizedBox(height: 32),
+                _dieColumn(
+                  label: 'd6',
+                  icon: Image.asset('assets/d6.png',
+                      width: 100, height: 100),
+                  onRoll: () => _rollStandard(6),
+                ),
+                _dieColumn(
+                  label: 'd8',
+                  icon: Image.asset('assets/d8.png',
+                      width: 100, height: 100),
+                  onRoll: () => _rollStandard(8),
+                ),
+              ],
+            ),
 
-              // — first row: coin, d6, d8
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _dieColumn(
-                    label: 'Coin',
-                    icon: Icon(Icons.monetization_on,
-                        size: 64, color: Colors.white),
-                    onRoll: _rollCoin,
-                  ),
-                  _dieColumn(
-                    label: 'd6',
-                    icon: Icon(Icons.casino, size: 64, color: Colors.white),
-                    onRoll: () => _rollStandard(6),
-                  ),
-                  _dieColumn(
-                    label: 'd8',
-                    icon: Icon(Icons.change_history,
-                        size: 64, color: Colors.white),
-                    onRoll: () => _rollStandard(8),
-                  ),
-                ],
-              ),
+            const SizedBox(height: 40),
 
-              const SizedBox(height: 32),
+            // second row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _dieColumn(
+                  label: 'd12',
+                  icon: Image.asset('assets/d12.png',
+                      width: 100, height: 100),
+                  onRoll: () => _rollStandard(12),
+                ),
+                _dieColumn(
+                  label: 'd20',
+                  icon: Image.asset('assets/d20.jpg',
+                      width: 100, height: 100),
+                  onRoll: () => _rollStandard(20),
+                ),
+                _customColumn(),
+              ],
+            ),
 
-              // — second row: d12, d20, custom‐icon
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _dieColumn(
-                    label: 'd12',
-                    icon: Icon(Icons.casino, size: 64, color: Colors.white),
-                    onRoll: () => _rollStandard(12),
-                  ),
-                  _dieColumn(
-                    label: 'd20',
-                    icon: Image.asset(
-                      'assets/images/d20.jpg',
-                      width: 64,
-                      height: 64,
-                    ),
-                    onRoll: () => _rollStandard(20),
-                  ),
-                  // just label + icon
-                  SizedBox(
-                    width: 100,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 6, horizontal: 12),
-                          decoration: BoxDecoration(
-                            color: Colors.grey.shade600,
-                            border: Border.all(color: Colors.white),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Text('Custom roll',
-                              style: TextStyle(color: Colors.white)),
-                        ),
-                        const SizedBox(height: 12),
-                        Image.asset(
-                          'assets/images/d20.jpg',
-                          width: 64,
-                          height: 64,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            const Spacer(),
 
-              const SizedBox(height: 24),
-
-              // — custom input
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SizedBox(
-                    width: 140,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 6, horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade600,
-                        border: Border.all(color: Colors.white),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: TextField(
-                        controller: _customController,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(
-                          isDense: true,
-                          border: InputBorder.none,
-                          hintText: 'Number of faces',
-                          hintStyle: TextStyle(color: Colors.white70),
-                        ),
-                        style: const TextStyle(color: Colors.white),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      shape: const StadiumBorder(),
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8, horizontal: 24),
-                    ),
-                    onPressed: _rollCustom,
-                    child:
-                    const Text('Roll', style: TextStyle(color: Colors.white)),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 48),
-
-              // — back to home
-              ElevatedButton(
+            Padding(
+              padding: const EdgeInsets.only(bottom: 24),
+              child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orangeAccent,
                   shape: const StadiumBorder(),
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 16, horizontal: 40),
+                  padding:
+                  const EdgeInsets.symmetric(vertical: 18, horizontal: 48),
+                  textStyle: const TextStyle(fontSize: 20),
                 ),
                 onPressed: () => Navigator.pop(context),
-                child: const Text(
-                  'Back to Home',
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
+                child: const Text('Back to Home'),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
