@@ -86,7 +86,7 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
           const SizedBox(height: 16),
 
           // icon
-          Image.asset('assets/d20.jpg', width: 100, height: 100),
+          Image.asset('assets/d20.png', width: 100, height: 100),
           const SizedBox(height: 16),
 
           // widened custom input box
@@ -106,7 +106,7 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
                 decoration: const InputDecoration(
                   isDense: true,
                   border: InputBorder.none,
-                  hintText: 'Number of faces',
+                  hintText: '# of faces',
                   hintStyle: TextStyle(color: Colors.white70, fontSize: 16),
                 ),
                 style: const TextStyle(color: Colors.white, fontSize: 16),
@@ -195,7 +195,7 @@ class _DiceRollerPageState extends State<DiceRollerPage> {
                 ),
                 _dieColumn(
                   label: 'd20',
-                  icon: Image.asset('assets/d20.jpg',
+                  icon: Image.asset('assets/d20.png',
                       width: 100, height: 100),
                   onRoll: () => _rollStandard(20),
                 ),
